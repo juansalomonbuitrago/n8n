@@ -1,1 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMO AI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white font-sans p-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-12">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                PMO Inteligent v1.0
+            </h1>
+            <div id="status-tag" class="px-4 py-1 rounded-full text-sm font-bold bg-slate-800 border border-slate-700">
+                Cargando...
+            </div>
+        </header>
 
+        <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl col-span-2">
+                <h2 class="text-slate-400 uppercase text-xs font-bold mb-4 tracking-widest">Análisis de la IA</h2>
+                <p id="resumen" class="text-lg leading-relaxed italic text-slate-200">Esperando datos de n8n...</p>
+            </div>
+
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                <h3 class="text-slate-400 text-xs font-bold mb-2">PROGRESO</h3>
+                <div class="text-4xl font-mono" id="avance">0%</div>
+            </div>
+            
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                <h3 class="text-slate-400 text-xs font-bold mb-2">ALERTA CRÍTICA</h3>
+                <div class="text-4xl font-mono" id="alerta">-</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                // Buscamos el archivo que crea n8n
+                const res = await fetch('./data/reporte.json');
+                const data = await res.json();
+
+                document.getElementById('resumen').innerText = data.resumen;
+                document.getElementById('avance').innerText = (data.completado || 0) + '%';
+                
+                const alertaEl = document.getElementById('alerta');
+                alertaEl.innerText = data.alerta ? 'SÍ' : 'NO';
+                alertaEl.className = data.alerta ? 'text-4xl font-mono text-red-500' : 'text-4xl font-mono text-green-500';
+                
+                document.getElementById('status-tag').innerText = 'ACTUALIZADO';
+            } catch (e) {
+                console.error("Error cargando el reporte:", e);
+                document.getElementById('status-tag').innerText = 'ERROR DE DATOS';
+            }
+        }
+        loadData();
+    </script>
+</body>
+</html>
